@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contractor ID Cards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Menu */
+        .sidebar {
+            width: 300px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .close-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .menu-section {
+            margin-bottom: 25px;
+        }
+        
+        .menu-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: var(--light-color);
+        }
+        
+        .user-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .user-btn {
+            padding: 12px 15px;
+            background-color: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-align: left;
+        }
+        
+        .user-btn.active {
+            background-color: var(--secondary-color);
+        }
+        
+        .user-btn:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        .menu-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 12px 15px;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .action-btn i {
+            font-size: 1.1rem;
+        }
+        
+        .edit-panel {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .edit-panel.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-option.active {
+            border-color: white;
+        }
+        
+        .btn {
+            padding: 12px 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+        }
+        
+        .menu-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .card-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .card-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cards {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+            width: 100%;
+        }
+        
+        .card {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .card-header {
+            height: 40%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .card-company {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .card-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .card-contact {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .card-id {
+            font-size: 1rem;
+            color: #777;
+            margin-top: 10px;
+        }
+        
+        .card-footer {
+            padding: 15px 20px;
+            background-color: rgba(0, 0, 0, 0.05);
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .card-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .nav-btn:disabled:hover {
+            transform: none;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-counter {
+            margin-top: 10px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        @media (max-width: 600px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .card-container {
+                height: 450px;
+            }
+            
+            .card-body {
+                padding: 15px;
+            }
+            
+            .card-name {
+                font-size: 1.5rem;
+            }
+            
+            .card-company {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Menu -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Contractor ID Manager</h2>
+                <button class="close-menu" id="closeMenu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Select User</h3>
+                <div class="user-selector">
+                    <button class="user-btn active" data-user="0">John Smith</button>
+                    <button class="user-btn" data-user="1">Sarah Johnson</button>
+                    <button class="user-btn" data-user="2">Michael Brown</button>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Actions</h3>
+                <div class="menu-actions">
+                    <button class="action-btn" id="editCardBtn">
+                        <i class="fas fa-edit"></i> Edit Current Card
+                    </button>
+                    <button class="action-btn" id="newCardBtn">
+                        <i class="fas fa-plus"></i> Create New Card
+                    </button>
+                </div>
+                
+                <div class="edit-panel" id="editPanel">
+                    <div class="form-group">
+                        <label for="cardCompany">Company Name</label>
+                        <input type="text" id="cardCompany" class="form-control" placeholder="Enter company name">
+                    </div>
+                    <div class="form-group">
+                        <label for="cardName">Contractor Name</label>
+                        <input type="text" id="cardName" class="form-control" placeholder="Enter contractor name">
+                    </div>
+                    <div class="form-group">
+                        <label for="cardTitle">Title</label>
+                        <input type="text" id="cardTitle" class="form-control" placeholder="Enter job title">
+                    </div>
+                    <div class="form-group">
+                        <label for="cardContact">Contact Number</label>
+                        <input type="text" id="cardContact" class="form-control" placeholder="Enter contact number">
+                    </div>
+                    <div class="form-group">
+                        <label for="cardId">ID Number</label>
+                        <input type="text" id="cardId" class="form-control" placeholder="Enter ID number">
+                    </div>
+                    <div class="form-group">
+                        <label>Background Color</label>
+                        <div class="color-picker">
+                            <div class="color-option active" style="background-color: #3498db;" data-color="#3498db"></div>
+                            <div class="color-option" style="background-color: #2ecc71;" data-color="#2ecc71"></div>
+                            <div class="color-option" style="background-color: #e74c3c;" data-color="#e74c3c"></div>
+                            <div class="color-option" style="background-color: #f39c12;" data-color="#f39c12"></div>
+                            <div class="color-option" style="background-color: #9b59b6;" data-color="#9b59b6"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="cardPhoto">Upload Photo</label>
+                        <input type="file" id="cardPhoto" class="form-control" accept="image/*">
+                    </div>
+                    <button class="btn" id="saveBtn">Save Changes</button>
+                    <button class="btn btn-danger" id="deleteCardBtn" style="margin-top: 10px;">Delete This Card</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="card-view">
+                <div class="card-container">
+                    <div class="cards" id="cardsContainer">
+                        <!-- Cards will be generated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="card-nav">
+                    <div class="nav-btn" id="prevBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="nav-btn" id="nextBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <div class="card-counter" id="cardCounter">
+                    Card 1 of 2
+                </div>
+            </div>
+        </div>
+        
+        <!-- Overlay for closing sidebar -->
+        <div class="overlay" id="overlay"></div>
+    </div>
+
+    <script>
+        // Sample data for ID cards
+        const users = [
+            {
+                name: "John Smith",
+                cards: [
+                    {
+                        company: "Tech Solutions Inc.",
+                        name: "John Smith",
+                        title: "Senior Electrician",
+                        contact: "(555) 123-4567",
+                        id: "TSI-2023-001",
+                        bgColor: "#3498db",
+                        photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                    },
+                    {
+                        company: "BuildRight Construction",
+                        name: "John Smith",
+                        title: "Project Manager",
+                        contact: "(555) 987-6543",
+                        id: "BRC-2023-045",
+                        bgColor: "#2ecc71",
+                        photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                    }
+                ]
+            },
+            {
+                name: "Sarah Johnson",
+                cards: [
+                    {
+                        company: "Green Energy Co.",
+                        name: "Sarah Johnson",
+                        title: "Solar Installer",
+                        contact: "(555) 456-7890",
+                        id: "GEC-2023-078",
+                        bgColor: "#e74c3c",
+                        photo: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                    },
+                    {
+                        company: "Secure Systems Ltd.",
+                        name: "Sarah Johnson",
+                        title: "Security Specialist",
+                        contact: "(555) 234-5678",
+                        id: "SSL-2023-112",
+                        bgColor: "#f39c12",
+                        photo: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                    }
+                ]
+            },
+            {
+                name: "Michael Brown",
+                cards: [
+                    {
+                        company: "DataFlow Networks",
+                        name: "Michael Brown",
+                        title: "Network Engineer",
+                        contact: "(555) 345-6789",
+                        id: "DFN-2023-156",
+                        bgColor: "#9b59b6",
+                        photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                    }
+                ]
+            }
+        ];
+
+        // DOM elements
+        const cardsContainer = document.getElementById('cardsContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const userBtns = document.querySelectorAll('.user-btn');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const saveBtn = document.getElementById('saveBtn');
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const closeMenu = document.getElementById('closeMenu');
+        const overlay = document.getElementById('overlay');
+        const editCardBtn = document.getElementById('editCardBtn');
+        const newCardBtn = document.getElementById('newCardBtn');
+        const editPanel = document.getElementById('editPanel');
+        const deleteCardBtn = document.getElementById('deleteCardBtn');
+        const cardCounter = document.getElementById('cardCounter');
+        
+        // Form inputs
+        const cardCompany = document.getElementById('cardCompany');
+        const cardName = document.getElementById('cardName');
+        const cardTitle = document.getElementById('cardTitle');
+        const cardContact = document.getElementById('cardContact');
+        const cardId = document.getElementById('cardId');
+        const cardPhoto = document.getElementById('cardPhoto');
+        
+        // State variables
+        let currentUserIndex = 0;
+        let currentCardIndex = 0;
+        let isEditing = false;
+        let isCreatingNew = false;
+        
+        // Initialize the application
+        function init() {
+            renderCards();
+            updateForm();
+            updateNavigation();
+            attachEventListeners();
+        }
+        
+        // Render cards for current user
+        function renderCards() {
+            cardsContainer.innerHTML = '';
+            const currentUser = users[currentUserIndex];
+            
+            currentUser.cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.style.backgroundColor = card.bgColor;
+                cardElement.dataset.index = index;
+                
+                cardElement.innerHTML = `
+                    <div class="card-header">
+                        <img src="${card.photo}" alt="${card.name}" class="card-photo">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-company">${card.company}</div>
+                        <div class="card-name">${card.name}</div>
+                        <div class="card-title">${card.title}</div>
+                        <div class="card-contact">${card.contact}</div>
+                        <div class="card-id">ID: ${card.id}</div>
+                    </div>
+                    <div class="card-footer">
+                        Valid through: ${new Date().getFullYear() + 2}
+                    </div>
+                `;
+                
+                cardsContainer.appendChild(cardElement);
+            });
+            
+            updateCardPosition();
+            updateNavigation();
+        }
+        
+        // Update card position based on current index
+        function updateCardPosition() {
+            // Fixed the bug: properly calculate the translation
+            const translateX = -currentCardIndex * 100;
+            cardsContainer.style.transform = `translateX(${translateX}%)`;
+        }
+        
+        // Update navigation buttons and counter
+        function updateNavigation() {
+            const currentUser = users[currentUserIndex];
+            const totalCards = currentUser.cards.length;
+            
+            // Update counter
+            cardCounter.textContent = `Card ${currentCardIndex + 1} of ${totalCards}`;
+            
+            // Update navigation buttons
+            prevBtn.disabled = currentCardIndex === 0;
+            nextBtn.disabled = currentCardIndex === totalCards - 1;
+            
+            // Visual feedback for disabled buttons
+            if (prevBtn.disabled) {
+                prevBtn.style.opacity = '0.5';
+            } else {
+                prevBtn.style.opacity = '1';
+            }
+            
+            if (nextBtn.disabled) {
+                nextBtn.style.opacity = '0.5';
+            } else {
+                nextBtn.style.opacity = '1';
+            }
+        }
+        
+        // Update form with current card data
+        function updateForm() {
+            const currentCard = users[currentUserIndex].cards[currentCardIndex];
+            
+            cardCompany.value = currentCard.company;
+            cardName.value = currentCard.name;
+            cardTitle.value = currentCard.title;
+            cardContact.value = currentCard.contact;
+            cardId.value = currentCard.id;
+            
+            // Update color picker
+            colorOptions.forEach(option => {
+                if (option.dataset.color === currentCard.bgColor) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+        }
+        
+        // Reset form to default values
+        function resetForm() {
+            cardCompany.value = '';
+            cardName.value = users[currentUserIndex].name;
+            cardTitle.value = '';
+            cardContact.value = '';
+            cardId.value = '';
+            
+            // Reset color to default
+            colorOptions.forEach(option => {
+                if (option.dataset.color === '#3498db') {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+            
+            // Reset file input
+            cardPhoto.value = '';
+        }
+        
+        // Toggle sidebar menu
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Hide edit panel when closing menu
+            if (!sidebar.classList.contains('active')) {
+                editPanel.classList.remove('active');
+                isEditing = false;
+                isCreatingNew = false;
+            }
+        }
+        
+        // Show edit panel
+        function showEditPanel() {
+            editPanel.classList.add('active');
+            isEditing = true;
+            isCreatingNew = false;
+            updateForm();
+            deleteCardBtn.style.display = 'block';
+        }
+        
+        // Show new card form
+        function showNewCardForm() {
+            editPanel.classList.add('active');
+            isCreatingNew = true;
+            isEditing = false;
+            resetForm();
+            deleteCardBtn.style.display = 'none';
+        }
+        
+        // Create a new card
+        function createNewCard() {
+            const currentUser = users[currentUserIndex];
+            
+            // Get selected color
+            const selectedColor = document.querySelector('.color-option.active').dataset.color;
+            
+            // Create new card object
+            const newCard = {
+                company: cardCompany.value || 'New Company',
+                name: cardName.value || currentUser.name,
+                title: cardTitle.value || 'Contractor',
+                contact: cardContact.value || '(555) 000-0000',
+                id: cardId.value || `${currentUser.name.substring(0, 3).toUpperCase()}-${new Date().getFullYear()}-${String(currentUser.cards.length + 1).padStart(3, '0')}`,
+                bgColor: selectedColor,
+                photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80' // Default placeholder image
+            };
+            
+            // Handle photo upload
+            if (cardPhoto.files && cardPhoto.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    newCard.photo = e.target.result;
+                    currentUser.cards.push(newCard);
+                    currentCardIndex = currentUser.cards.length - 1;
+                    renderCards();
+                    updateForm();
+                };
+                reader.readAsDataURL(cardPhoto.files[0]);
+            } else {
+                currentUser.cards.push(newCard);
+                currentCardIndex = currentUser.cards.length - 1;
+                renderCards();
+                updateForm();
+            }
+            
+            alert('New card created successfully!');
+            editPanel.classList.remove('active');
+            isCreatingNew = false;
+        }
+        
+        // Delete current card
+        function deleteCurrentCard() {
+            const currentUser = users[currentUserIndex];
+            
+            if (currentUser.cards.length <= 1) {
+                alert('Cannot delete the only card for this user.');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this card?')) {
+                currentUser.cards.splice(currentCardIndex, 1);
+                
+                // Adjust current card index if needed
+                if (currentCardIndex >= currentUser.cards.length) {
+                    currentCardIndex = currentUser.cards.length - 1;
+                }
+                
+                renderCards();
+                updateForm();
+                editPanel.classList.remove('active');
+                isEditing = false;
+                
+                alert('Card deleted successfully!');
+            }
+        }
+        
+        // Attach event listeners
+        function attachEventListeners() {
+            // Menu toggle
+            menuToggle.addEventListener('click', toggleMenu);
+            closeMenu.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+            
+            // Edit card button
+            editCardBtn.addEventListener('click', showEditPanel);
+            
+            // New card button
+            newCardBtn.addEventListener('click', showNewCardForm);
+            
+            // Delete card button
+            deleteCardBtn.addEventListener('click', deleteCurrentCard);
+            
+            // Navigation buttons
+            prevBtn.addEventListener('click', () => {
+                if (currentCardIndex > 0) {
+                    currentCardIndex--;
+                    updateCardPosition();
+                    updateForm();
+                    updateNavigation();
+                }
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                if (currentCardIndex < users[currentUserIndex].cards.length - 1) {
+                    currentCardIndex++;
+                    updateCardPosition();
+                    updateForm();
+                    updateNavigation();
+                }
+            });
+            
+            // User selection
+            userBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    userBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    currentUserIndex = parseInt(btn.dataset.user);
+                    currentCardIndex = 0;
+                    renderCards();
+                    updateForm();
+                    
+                    // Hide edit panel when switching users
+                    editPanel.classList.remove('active');
+                    isEditing = false;
+                    isCreatingNew = false;
+                });
+            });
+            
+            // Color selection
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                });
+            });
+            
+            // Save changes
+            saveBtn.addEventListener('click', () => {
+                if (isCreatingNew) {
+                    createNewCard();
+                } else {
+                    const currentCard = users[currentUserIndex].cards[currentCardIndex];
+                    
+                    currentCard.company = cardCompany.value;
+                    currentCard.name = cardName.value;
+                    currentCard.title = cardTitle.value;
+                    currentCard.contact = cardContact.value;
+                    currentCard.id = cardId.value;
+                    
+                    // Get selected color
+                    const selectedColor = document.querySelector('.color-option.active').dataset.color;
+                    currentCard.bgColor = selectedColor;
+                    
+                    // Handle photo upload
+                    if (cardPhoto.files && cardPhoto.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            currentCard.photo = e.target.result;
+                            renderCards();
+                        };
+                        reader.readAsDataURL(cardPhoto.files[0]);
+                    } else {
+                        renderCards();
+                    }
+                    
+                    alert('Card updated successfully!');
+                    editPanel.classList.remove('active');
+                    isEditing = false;
+                }
+            });
+            
+            // Swipe support for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            cardsContainer.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            cardsContainer.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    // Swipe left - next card
+                    if (currentCardIndex < users[currentUserIndex].cards.length - 1) {
+                        currentCardIndex++;
+                        updateCardPosition();
+                        updateForm();
+                        updateNavigation();
+                    }
+                }
+                
+                if (touchEndX > touchStartX + swipeThreshold) {
+                    // Swipe right - previous card
+                    if (currentCardIndex > 0) {
+                        currentCardIndex--;
+                        updateCardPosition();
+                        updateForm();
+                        updateNavigation();
+                    }
+                }
+            }
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
